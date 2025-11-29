@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Intelligence Artificielle : Guide Interactif</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfbf9; /* Warm neutral background */
+            color: #1f2937;
+        }
+
+        /* Custom Chart Container Styling as per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; 
+        }
+
+        .nav-active {
+            background-color: #e5e7eb;
+            color: #111827;
+            font-weight: 600;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Neural Network HTML/CSS Viz */
+        .neuron {
+            width: 12px;
+            height: 12px;
+            background-color: #e0e7ff;
+            border: 2px solid #4f46e5;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .connection {
+            position: absolute;
+            background-color: #c7d2fe;
+            height: 2px;
+            transform-origin: 0 50%;
+            z-index: 1;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Background #fcfbf9) with Indigo (#4f46e5) and Slate (#1f2937) for professional contrast. Accents in Emerald and Amber. -->
+    <!-- Application Structure Plan: 
+         - Layout: Sidebar navigation (desktop) / Top bar (mobile) for easy switching between themes.
+         - Sections:
+           1. Tableau de Bord (Home): Introduction, definitions, and Weak vs Strong AI visualization.
+           2. Chronologie (History): Interactive Line Chart representing 'AI Optimism' to visualize Winters/Summers.
+           3. Le Moteur (Tech): Interactive cards for ML types and a CSS-based Neural Network diagram for Deep Learning.
+           4. Applications (Real World): Grid of sectors (Health, Finance, etc.) that updates a detailed view.
+           5. Défis (Conclusion): Accordion style for Ethics, Jobs, and Regulation.
+         - Rationale: The non-linear structure allows users to jump to what interests them (History vs Tech vs Usage) while maintaining a logical flow from Definition -> History -> How it works -> Where it's used -> Future.
+    -->
+    <!-- Visualization & Content Choices:
+         - Weak vs Strong AI: Doughnut Chart. Goal: Show the disparity between current reality (Weak) and sci-fi (Strong).
+         - History: Line Chart showing "Hype/Funding". Goal: Visualise the "Winters" mentioned in text. Interaction: Click point to read details.
+         - ML Types: Interactive Cards. Goal: Simplify the 3 types of learning.
+         - Applications: Interactive Grid + Contextual Text. Goal: Allow exploration of specific industries.
+         - Challenges: Accordion. Goal: Organize dense text into manageable chunks.
+         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- Navigation -->
+        <nav class="bg-white border-r border-gray-200 w-full md:w-64 flex-shrink-0 z-50">
+            <div class="p-6 border-b border-gray-100">
+                <h1 class="text-2xl font-bold text-indigo-600 tracking-tight">IA : L'Essentiel</h1>
+                <p class="text-xs text-gray-500 mt-1">Guide Interactif</p>
+            </div>
+            <ul class="flex flex-row md:flex-col overflow-x-auto md:overflow-visible w-full text-sm">
+                <li><button onclick="navigate('home')" id="nav-home" class="nav-btn w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors nav-active">1. Vue d'Ensemble</button></li>
+                <li><button onclick="navigate('history')" id="nav-history" class="nav-btn w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors">2. Histoire & Cycles</button></li>
+                <li><button onclick="navigate('tech')" id="nav-tech" class="nav-btn w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors">3. La Technologie</button></li>
+                <li><button onclick="navigate('apps')" id="nav-apps" class="nav-btn w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors">4. Applications Réelles</button></li>
+                <li><button onclick="navigate('future')" id="nav-future" class="nav-btn w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors">5. Enjeux & Futur</button></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto h-screen" id="main-scroll">
+            
+            <!-- SECTION 1: HOME / OVERVIEW -->
+            <section id="section-home" class="animate-fade-in max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-sm p-8 mb-8 border border-gray-100">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Bienvenue dans l'Ère de l'IA</h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        L'Intelligence Artificielle n'est plus de la science-fiction. Elle est présente dans nos téléphones, nos voitures et nos hôpitaux.
+                        Cette application interactive transforme le rapport source en une expérience exploratoire pour comprendre ce qu'est l'IA, 
+                        comment elle a évolué (ses "hivers" et son âge d'or) et comment elle redéfinit notre réalité.
+                    </p>
+                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r">
+                        <p class="font-medium text-indigo-900">Définition Clé</p>
+                        <p class="text-indigo-800 mt-1">
+                            L'IA est la simulation des processus d'intelligence humaine par des machines : apprentissage, raisonnement, perception et résolution de problèmes.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">La Réalité vs La Fiction</h3>
+                        <p class="text-gray-600 mb-4">
+                            Il existe une distinction fondamentale souvent mal comprise : l'IA que nous utilisons aujourd'hui (Siri, ChatGPT) est très différente de l'IA des films.
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2 text-xl">●</span>
+                                <div>
+                                    <strong class="text-gray-800">IA Faible (Étroite)</strong>
+                                    <p class="text-sm text-gray-500">Conçue pour une tâche spécifique (ex: échecs, reconnaissance faciale). C'est 100% de l'IA actuelle.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-gray-400 mr-2 text-xl">●</span>
+                                <div>
+                                    <strong class="text-gray-800">IA Forte (Générale)</strong>
+                                    <p class="text-sm text-gray-500">Hypothétique. Capacité intellectuelle équivalente à l'humain, capable de tout apprendre. N'existe pas encore.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">
+                        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">État Actuel du Développement</h4>
+                        <div class="chart-container">
+                            <canvas id="chart-types"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-gray-400 mt-2">Répartition conceptuelle des systèmes existants</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: HISTORY -->
+            <section id="section-history" class="hidden animate-fade-in max-w-5xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Une Histoire de Cycles</h2>
+                    <p class="text-gray-600">
+                        L'IA n'est pas une invention récente. Son histoire est marquée par des cycles d'optimisme démesuré ("Printemps") suivis de périodes de désillusion et de coupures budgétaires ("Hivers").
+                        Explorez le graphique ci-dessous pour voir l'évolution de l'intérêt et du progrès technologique.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-700">Chronologie de l'IA : Hype vs Réalité</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Interactif</span>
+                    </div>
+                    <div class="chart-container" style="max-height: 350px;">
+                        <canvas id="chart-history"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-gray-400 mt-4">Cliquez sur les points pour voir les détails historiques.</p>
+                </div>
+
+                <div id="history-detail" class="bg-gray-50 p-6 rounded-xl border border-gray-200 transition-all duration-300">
+                    <h3 class="text-xl font-bold text-indigo-700 mb-2" id="hist-title">1956 : La Naissance</h3>
+                    <p class="text-gray-700" id="hist-desc">
+                        L'atelier de Dartmouth. Le terme "Intelligence Artificielle" est officiellement inventé par John McCarthy. C'est le point de départ officiel de la discipline académique.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SECTION 3: TECHNOLOGY -->
+            <section id="section-tech" class="hidden animate-fade-in max-w-5xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Les Moteurs de l'IA</h2>
+                    <p class="text-gray-600 mb-6">
+                        Comment les machines apprennent-elles ? Au cœur de l'IA moderne se trouve le <strong>Machine Learning (ML)</strong>, une approche où les ordinateurs apprennent à partir de données sans être explicitement programmés pour chaque règle.
+                    </p>
+                </div>
+
+                <!-- ML Types Cards -->
+                <div class="grid md:grid-cols-3 gap-6 mb-12">
+                    <!-- Card 1 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-500 card-hover cursor-pointer" onclick="showTechDetail('supervised')">
+                        <div class="text-4xl mb-4">🏷️</div>
+                        <h3 class="font-bold text-lg mb-2">Apprentissage Supervisé</h3>
+                        <p class="text-sm text-gray-500">Le modèle apprend avec un "professeur". Données étiquetées (Entrée -> Sortie).</p>
+                        <button class="mt-4 text-blue-600 text-sm font-semibold hover:underline">Voir exemple</button>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-purple-500 card-hover cursor-pointer" onclick="showTechDetail('unsupervised')">
+                        <div class="text-4xl mb-4">🧩</div>
+                        <h3 class="font-bold text-lg mb-2">Apprentissage Non Supervisé</h3>
+                        <p class="text-sm text-gray-500">Le modèle apprend seul. Il cherche des structures cachées dans des données brutes.</p>
+                        <button class="mt-4 text-purple-600 text-sm font-semibold hover:underline">Voir exemple</button>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-500 card-hover cursor-pointer" onclick="showTechDetail('reinforcement')">
+                        <div class="text-4xl mb-4">🎮</div>
+                        <h3 class="font-bold text-lg mb-2">Par Renforcement</h3>
+                        <p class="text-sm text-gray-500">Apprentissage par essai-erreur. Actions récompensées ou punies.</p>
+                        <button class="mt-4 text-orange-600 text-sm font-semibold hover:underline">Voir exemple</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Tech Detail Box -->
+                <div id="tech-detail-box" class="bg-blue-50 p-6 rounded-lg mb-12 border border-blue-100 transition-all">
+                    <h4 class="font-bold text-blue-900 mb-2">Exemple : Apprentissage Supervisé</h4>
+                    <p class="text-blue-800">Prédire le prix d'une maison en fonction de sa surface, ou classifier si une photo contient un chat ou un chien.</p>
+                </div>
+
+                <!-- Deep Learning Visualization (HTML/CSS) -->
+                <div class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+                    <div class="flex flex-col md:flex-row items-center gap-8">
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Deep Learning & Réseaux de Neurones</h3>
+                            <p class="text-gray-600 mb-4 text-sm">
+                                Inspiré du cerveau humain, le Deep Learning utilise des couches de neurones artificiels. C'est cette technologie qui permet à ChatGPT de comprendre le langage ou à Midjourney de créer des images.
+                            </p>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center"><span class="w-3 h-3 bg-indigo-200 rounded-full mr-2"></span> Couche d'Entrée (Données brutes)</div>
+                                <div class="flex items-center"><span class="w-3 h-3 bg-indigo-400 rounded-full mr-2"></span> Couches Cachées (Traitement profond)</div>
+                                <div class="flex items-center"><span class="w-3 h-3 bg-indigo-600 rounded-full mr-2"></span> Couche de Sortie (Résultat)</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Visualizing a Neural Network using Flex/Grid (No SVG) -->
+                        <div class="relative w-full md:w-1/2 h-64 bg-gray-50 rounded-lg flex justify-between items-center px-8 overflow-hidden">
+                            <!-- Input Layer -->
+                            <div class="flex flex-col gap-4 z-10">
+                                <div class="neuron bg-indigo-200 border-indigo-300"></div>
+                                <div class="neuron bg-indigo-200 border-indigo-300"></div>
+                                <div class="neuron bg-indigo-200 border-indigo-300"></div>
+                                <div class="neuron bg-indigo-200 border-indigo-300"></div>
+                            </div>
+                            <!-- Hidden Layer 1 -->
+                            <div class="flex flex-col gap-4 z-10">
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                            </div>
+                             <!-- Hidden Layer 2 -->
+                             <div class="flex flex-col gap-4 z-10">
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                                <div class="neuron bg-indigo-400 border-indigo-500"></div>
+                            </div>
+                            <!-- Output Layer -->
+                            <div class="flex flex-col gap-8 z-10">
+                                <div class="neuron bg-indigo-600 border-indigo-700 w-4 h-4"></div>
+                                <div class="neuron bg-indigo-600 border-indigo-700 w-4 h-4"></div>
+                            </div>
+
+                            <!-- CSS-only stylized connections (Simulated lines) -->
+                            <div class="absolute inset-0 opacity-20">
+                                <!-- Just abstract lines via gradient or simplistic layout is hard without SVG. 
+                                     Instead, we rely on the node proximity to imply connection for a cleaner 'No SVG' look. -->
+                                <div class="absolute top-1/2 left-1/4 w-1/4 h-px bg-indigo-500 transform -rotate-12"></div>
+                                <div class="absolute top-1/2 left-1/4 w-1/4 h-px bg-indigo-500 transform rotate-12"></div>
+                                <div class="absolute top-1/2 right-1/4 w-1/4 h-px bg-indigo-500 transform -rotate-6"></div>
+                                <div class="absolute top-1/2 right-1/4 w-1/4 h-px bg-indigo-500 transform rotate-6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: APPLICATIONS -->
+            <section id="section-apps" class="hidden animate-fade-in max-w-5xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Applications dans le Monde Réel</h2>
+                    <p class="text-gray-600">
+                        L'IA est passée des laboratoires de recherche à notre quotidien, transformant radicalement des secteurs entiers.
+                        Sélectionnez un secteur ci-dessous pour voir comment l'IA y est appliquée.
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Selector List -->
+                    <div class="space-y-3">
+                        <button onclick="updateAppView('health')" class="app-btn w-full text-left p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:border-red-400 hover:bg-red-50 transition-all flex items-center group focus:ring-2 focus:ring-red-200">
+                            <span class="text-2xl mr-3 group-hover:scale-110 transition-transform">🏥</span>
+                            <span class="font-bold text-gray-700">Santé</span>
+                        </button>
+                        <button onclick="updateAppView('finance')" class="app-btn w-full text-left p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:border-green-400 hover:bg-green-50 transition-all flex items-center group focus:ring-2 focus:ring-green-200">
+                            <span class="text-2xl mr-3 group-hover:scale-110 transition-transform">📉</span>
+                            <span class="font-bold text-gray-700">Finance</span>
+                        </button>
+                        <button onclick="updateAppView('transport')" class="app-btn w-full text-left p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 transition-all flex items-center group focus:ring-2 focus:ring-yellow-200">
+                            <span class="text-2xl mr-3 group-hover:scale-110 transition-transform">🚗</span>
+                            <span class="font-bold text-gray-700">Transport</span>
+                        </button>
+                        <button onclick="updateAppView('creative')" class="app-btn w-full text-left p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:border-pink-400 hover:bg-pink-50 transition-all flex items-center group focus:ring-2 focus:ring-pink-200">
+                            <span class="text-2xl mr-3 group-hover:scale-110 transition-transform">🎨</span>
+                            <span class="font-bold text-gray-700">Création (GenAI)</span>
+                        </button>
+                    </div>
+
+                    <!-- Detail View -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 h-full flex flex-col">
+                            <div class="flex items-center mb-6">
+                                <div id="app-icon" class="text-4xl mr-4 bg-gray-100 p-3 rounded-full">🏥</div>
+                                <div>
+                                    <h3 id="app-title" class="text-2xl font-bold text-gray-800">Diagnostic Médical</h3>
+                                    <span id="app-tag" class="text-xs uppercase font-bold text-red-500 tracking-wide">Impact Critique</span>
+                                </div>
+                            </div>
+                            
+                            <p id="app-desc" class="text-gray-600 mb-6 flex-grow leading-relaxed">
+                                L'IA analyse des radiographies et des IRM avec une précision souvent supérieure à l'œil humain pour détecter des cancers précoces. Elle accélère également la découverte de nouveaux médicaments en simulant des molécules.
+                            </p>
+
+                            <div class="mt-auto">
+                                <h4 class="text-sm font-semibold text-gray-400 mb-2 uppercase">Niveau d'Adoption & Impact</h4>
+                                <div class="chart-container" style="height: 200px;">
+                                    <canvas id="chart-apps"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: FUTURE & CHALLENGES -->
+            <section id="section-future" class="hidden animate-fade-in max-w-4xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">L'Avenir et les Défis</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">
+                        L'IA est un outil puissant, mais pas sans risques. Pour atteindre l'IA Forte de manière responsable, nous devons surmonter trois défis majeurs identifiés dans le rapport.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Accordion Item 1 -->
+                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                        <button onclick="toggleAccordion('acc-1')" class="w-full text-left px-6 py-4 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <span class="font-bold text-gray-800 flex items-center"><span class="mr-2">⚖️</span> Éthique et Biais</span>
+                            <span id="icon-acc-1" class="text-gray-400 transform transition-transform duration-200">+</span>
+                        </button>
+                        <div id="acc-1" class="hidden px-6 py-4 text-gray-600 bg-white">
+                            <p>Les systèmes d'IA apprennent à partir de données humaines. Si ces données contiennent des préjugés (racisme, sexisme), l'IA les reproduira et les amplifiera. Le défi est de créer des jeux de données "propres" et des algorithmes équitables.</p>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Item 2 -->
+                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                        <button onclick="toggleAccordion('acc-2')" class="w-full text-left px-6 py-4 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <span class="font-bold text-gray-800 flex items-center"><span class="mr-2">💼</span> Emploi & Automatisation</span>
+                            <span id="icon-acc-2" class="text-gray-400 transform transition-transform duration-200">+</span>
+                        </button>
+                        <div id="acc-2" class="hidden px-6 py-4 text-gray-600 bg-white">
+                            <p>La robotisation et l'automatisation intelligente pourraient remplacer certains emplois répétitifs ou analytiques. Cela nécessite une réflexion sociétale sur la reconversion massive et l'éducation future.</p>
+                        </div>
+                    </div>
+
+                    <!-- Accordion Item 3 -->
+                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                        <button onclick="toggleAccordion('acc-3')" class="w-full text-left px-6 py-4 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <span class="font-bold text-gray-800 flex items-center"><span class="mr-2">🔒</span> Sécurité & Réglementation</span>
+                            <span id="icon-acc-3" class="text-gray-400 transform transition-transform duration-200">+</span>
+                        </button>
+                        <div id="acc-3" class="hidden px-6 py-4 text-gray-600 bg-white">
+                            <p>Deepfakes, cyberattaques automatisées, armes autonomes... Le besoin de cadres juridiques mondiaux pour gouverner l'utilisation de l'IA est urgent pour éviter les dérives malveillantes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 bg-indigo-900 text-white p-8 rounded-2xl text-center shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4">Conclusion</h3>
+                    <p class="mb-6 opacity-90">
+                        "L'IA n'est pas une fin, mais un outil puissant entre nos mains." <br>
+                        Le chemin vers l'IA Forte est encore long, mais l'IA Faible révolutionne déjà notre monde.
+                    </p>
+                    <button onclick="navigate('home')" class="bg-white text-indigo-900 px-6 py-2 rounded-full font-bold hover:bg-indigo-50 transition-colors">
+                        Recommencer l'Exploration
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            currentSection: 'home',
+            data: {
+                history: [
+                    { year: 1950, value: 30, label: "Test de Turing", desc: "Alan Turing propose son test célèbre." },
+                    { year: 1956, value: 50, label: "Naissance (Dartmouth)", desc: "L'atelier de Dartmouth. Le terme 'IA' est inventé." },
+                    { year: 1965, value: 80, label: "L'Âge d'Or", desc: "Optimisme sans borne. Résolution de théorèmes." },
+                    { year: 1974, value: 20, label: "1er Hiver", desc: "Financement coupé. Promesses non tenues." },
+                    { year: 1980, value: 60, label: "Systèmes Experts", desc: "L'IA basée sur des règles réussit en entreprise." },
+                    { year: 1987, value: 25, label: "2ème Hiver", desc: "Les systèmes experts s'avèrent trop coûteux." },
+                    { year: 1997, value: 50, label: "Deep Blue", desc: "L'ordinateur bat Kasparov aux échecs." },
+                    { year: 2012, value: 85, label: "Ère Deep Learning", desc: "Explosion de la puissance de calcul et des données." },
+                    { year: 2023, value: 98, label: "IA Générative", desc: "ChatGPT, Midjourney. L'IA devient grand public." }
+                ],
+                apps: {
+                    health: {
+                        title: "Diagnostic Médical",
+                        desc: "L'IA analyse des radiographies, des IRM, et des scanners avec une rapidité et une précision souvent supérieures à celles de l'œil humain pour détecter des maladies comme le cancer. Elle accélère aussi la découverte de médicaments.",
+                        icon: "🏥",
+                        color: "red",
+                        stats: [85, 40, 90] // Efficiency, Cost, Accuracy impact
+                    },
+                    finance: {
+                        title: "Finance & Trading",
+                        desc: "L'IA exécute des transactions à haute fréquence (trading algorithmique) et détecte les fraudes en temps réel en analysant des millions de transactions pour repérer des anomalies.",
+                        icon: "📉",
+                        color: "green",
+                        stats: [95, 60, 80]
+                    },
+                    transport: {
+                        title: "Véhicules Autonomes",
+                        desc: "Utilisation de la vision par ordinateur pour percevoir l'environnement. Optimisation logistique des itinéraires de livraison pour réduire les coûts et l'empreinte carbone.",
+                        icon: "🚗",
+                        color: "yellow",
+                        stats: [60, 50, 70]
+                    },
+                    creative: {
+                        title: "IA Générative",
+                        desc: "Création de contenu nouveau : texte (LLMs), images photoréalistes (Diffusion), et musique. Un outil puissant pour assister la créativité humaine.",
+                        icon: "🎨",
+                        color: "pink",
+                        stats: [90, 80, 85]
+                    }
+                }
+            }
+        };
+
+        // --- Navigation Logic ---
+        function navigate(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            
+            // Show target section
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            
+            // Update Nav State
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('nav-active');
+            });
+            document.getElementById(`nav-${sectionId}`).classList.add('nav-active');
+
+            // Scroll to top
+            document.getElementById('main-scroll').scrollTo(0,0);
+
+            // Trigger animations or chart updates if needed
+            if(sectionId === 'history' && window.historyChart) {
+                window.historyChart.update();
+            }
+        }
+
+        // --- Tech Section Interactions ---
+        function showTechDetail(type) {
+            const box = document.getElementById('tech-detail-box');
+            let title, text, colorClass, borderClass;
+
+            if (type === 'supervised') {
+                title = "Exemple : Apprentissage Supervisé";
+                text = "C'est comme apprendre à un enfant avec des cartes flash. 'Voici une pomme', 'Voici une banane'. L'IA apprend à classer : Prédire le prix d'une maison ou filtrer les spams.";
+                colorClass = "bg-blue-50 text-blue-800 border-blue-100";
+            } else if (type === 'unsupervised') {
+                title = "Exemple : Apprentissage Non Supervisé";
+                text = "L'IA reçoit des milliers de profils clients sans étiquettes. Elle découvre seule : 'Ce groupe achète des couches et de la bière le vendredi'. Utile pour la segmentation marketing (Clustering).";
+                colorClass = "bg-purple-50 text-purple-800 border-purple-100";
+            } else {
+                title = "Exemple : Apprentissage par Renforcement";
+                text = "Comme dresser un chien avec des friandises. L'IA joue à Mario Bros : elle meurt (punition), elle avance (rien), elle finit le niveau (récompense). Elle apprend la stratégie optimale.";
+                colorClass = "bg-orange-50 text-orange-800 border-orange-100";
+            }
+
+            // Reset classes
+            box.className = `p-6 rounded-lg mb-12 border transition-all ${colorClass}`;
+            box.innerHTML = `<h4 class="font-bold mb-2 text-lg">${title}</h4><p>${text}</p>`;
+        }
+
+        // --- Applications Interaction ---
+        let appsChartInstance = null;
+
+        function updateAppView(key) {
+            const data = state.data.apps[key];
+            const iconEl = document.getElementById('app-icon');
+            const titleEl = document.getElementById('app-title');
+            const tagEl = document.getElementById('app-tag');
+            const descEl = document.getElementById('app-desc');
+
+            // Update Text
+            titleEl.textContent = data.title;
+            descEl.textContent = data.desc;
+            iconEl.textContent = data.icon;
+            
+            // Update Styles
+            iconEl.className = `text-4xl mr-4 bg-${data.color}-100 p-3 rounded-full text-${data.color}-600`;
+            tagEl.className = `text-xs uppercase font-bold text-${data.color}-500 tracking-wide`;
+
+            // Update Chart
+            updateAppsChart(data.stats, data.color);
+        }
+
+        function updateAppsChart(dataPoints, colorName) {
+            const ctx = document.getElementById('chart-apps').getContext('2d');
+            
+            // Map color names to hex for Chart.js
+            const colorMap = {
+                'red': 'rgb(239, 68, 68)',
+                'green': 'rgb(34, 197, 94)',
+                'yellow': 'rgb(234, 179, 8)',
+                'pink': 'rgb(236, 72, 153)'
+            };
+            const color = colorMap[colorName] || 'gray';
+
+            if (appsChartInstance) {
+                appsChartInstance.destroy();
+            }
+
+            appsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Vitesse / Efficacité', 'Réduction Coûts', 'Précision / Qualité'],
+                    datasets: [{
+                        label: 'Impact Relatif (%)',
+                        data: dataPoints,
+                        backgroundColor: color,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        // --- Accordion Logic ---
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '-';
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '+';
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // --- Initialization ---
+        window.onload = function() {
+            
+            // 1. Chart: Types (Home)
+            const ctxTypes = document.getElementById('chart-types').getContext('2d');
+            new Chart(ctxTypes, {
+                type: 'doughnut',
+                data: {
+                    labels: ['IA Faible (Actuelle)', 'IA Forte (Hypothétique)'],
+                    datasets: [{
+                        data: [99, 1],
+                        backgroundColor: ['#4f46e5', '#e5e7eb'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // 2. Chart: History (Timeline)
+            const ctxHistory = document.getElementById('chart-history').getContext('2d');
+            window.historyChart = new Chart(ctxHistory, {
+                type: 'line',
+                data: {
+                    labels: state.data.history.map(d => d.year),
+                    datasets: [{
+                        label: 'Niveau d\'Optimisme / Financement',
+                        data: state.data.history.map(d => d.value),
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4f46e5',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return state.data.history[context.dataIndex].label;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const data = state.data.history[index];
+                            document.getElementById('hist-title').textContent = `${data.year} : ${data.label}`;
+                            document.getElementById('hist-desc').textContent = data.desc;
+                            
+                            // Visual feedback
+                            document.getElementById('history-detail').classList.add('ring-2', 'ring-indigo-200');
+                            setTimeout(() => document.getElementById('history-detail').classList.remove('ring-2', 'ring-indigo-200'), 300);
+                        }
+                    }
+                }
+            });
+
+            // Initialize App View
+            updateAppView('health');
+        };
+
+    </script>
+</body>
+</html>
